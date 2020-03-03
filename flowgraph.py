@@ -2,6 +2,8 @@ from binaryninja import *
 import graphviz
 import tempfile
 import os
+os.environ['PATH'] += os.pathsep + '/usr/local/bin/'
+GRAPHVIZ_OUTPUT_PATH = '/tmp/'
 
 # reference: http://matthiaseisen.com/articles/graphviz/
 
@@ -20,7 +22,7 @@ class BinocularsFlowgraph(BackgroundTaskThread):
                 'fontsize': '16',
                 'fontcolor': 'white',
                 #'bgcolor': '#333333',
-                'bgcolor': '#101010',                
+                'bgcolor': '#101010',
                 #'rankdir': 'LR',
             },
             'nodes': {
@@ -46,26 +48,26 @@ class BinocularsFlowgraph(BackgroundTaskThread):
         graph.graph_attr.update(('graph' in styles and styles['graph']) or {})
         graph.node_attr.update(('nodes' in styles and styles['nodes']) or {})
         graph.edge_attr.update(('edges' in styles and styles['edges']) or {})
-        return graph        
+        return graph
 
-    def view_flowgraph_to_bin(self):        
+    def view_flowgraph_to_bin(self):
         g = graphviz.Digraph(format='png')
         flowgraph = self.build_flowgraph_to_bin()
         for node in flowgraph.keys():
             g.node(node)
             dst = node
-            for src in flowgraph[dst]: 
+            for src in flowgraph[dst]:
                 g.edge(src, dst)
 
         styles = self.get_styles('flowgraph')
         g = self.apply_styles(g, styles)
-        g.view()
+        g.view(directory=GRAPHVIZ_OUTPUT_PATH)
 
-    def view_flowgraph_to_function(self):        
+    def view_flowgraph_to_function(self):
         g = graphviz.Digraph(format='png')
         filename = "%s-%s" % (os.path.basename(self.bv.file.filename), self.function.symbol.name)
         fullpath = os.path.join(tempfile.gettempdir(), filename)
-        
+
         flowgraph = {}
         self.build_flowgraph_to_function_recursive(self.function, flowgraph)
         for node in flowgraph.keys():
