@@ -1,7 +1,7 @@
 from binaryninja import *
-from flowgraph import *
-from list_comments import *
-from textify_function import *
+from .flowgraph import *
+from .list_comments import *
+from .textify_function import *
 
 
 
